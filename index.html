@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Sensor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .table-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .timestamp {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .sensor-value {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .failed {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .pallet-badge {
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .pallet-yes {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .pallet-no {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .battery-bar {
+            background: #e9ecef;
+            border-radius: 5px;
+            height: 25px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: white;
+            min-width: 120px;
+        }
+
+        .battery-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }
+
+        .battery-high {
+            background: linear-gradient(90deg, #28a745, #20c997);
+        }
+
+        .battery-medium {
+            background: linear-gradient(90deg, #ffc107, #fd7e14);
+            color: #333;
+        }
+
+        .battery-low {
+            background: linear-gradient(90deg, #dc3545, #c82333);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: white;
+        }
+
+        .no-data h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .no-data p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .no-data code {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .info-banner {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.95em;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .battery-bar {
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Warehouse Sensor Dashboard</h1>
+            <p>Real-time Monitoring System</p>
+        </header>
+
+        {% if readings %}
+            <div class="info-banner">
+                ✓ Connected | 📈 Latest 15 readings displayed | 🔄 Auto-refreshing every 5 seconds
+            </div>
+
+            <div class="table-container">
+                <h2>Latest 15 Sensor Readings</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Temperature (°C)</th>
+                            <th>Humidity (%)</th>
+                            <th>Vibration</th>
+                            <th>Battery (%)</th>
+                            <th>Pallet Present</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reading in readings %}
+                        <tr>
+                            <td>#{{ reading.id }}</td>
+                            <td class="timestamp">{{ reading.timestamp }}</td>
+                            
+                            <td>
+                                {% if reading.temperature_failed %}
+                                    <span class="failed">✗ Failed</span>
+                                {% else %}
+                                    {% if reading.temperature %}
+                                        <span class="sensor-value">{{ "%.2f"|format(reading.temperature) }}</span>
+                                    {% else %}
+                                        <span>N/A</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% if reading.humidity_failed %}
+                                    <span class="failed">✗ Failed</span>
+                                {% else %}
+                                    {% if reading.humidity %}
+                                        <span class="sensor-value">{{ "%.2f"|format(reading.humidity) }}</span>
+                                    {% else %}
+                                        <span>N/A</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% if reading.vibration_failed %}
+                                    <span class="failed">✗ Failed</span>
+                                {% else %}
+                                    {% if reading.vibration %}
+                                        <span class="sensor-value">{{ "%.2f"|format(reading.vibration) }}</span>
+                                    {% else %}
+                                        <span>N/A</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% set batt = reading.battery %}
+                                <div class="battery-bar">
+                                    {% if batt > 50 %}
+                                        {% set batt_class = 'battery-high' %}
+                                    {% elif batt > 20 %}
+                                        {% set batt_class = 'battery-medium' %}
+                                    {% else %}
+                                        {% set batt_class = 'battery-low' %}
+                                    {% endif %}
+                                    <div class="battery-fill {{ batt_class }}" style="width: {{ batt }}%">
+                                        {{ "%.1f"|format(batt) }}%
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <span class="pallet-badge {% if reading.pallet_present %}pallet-yes{% else %}pallet-no{% endif %}">
+                                    {% if reading.pallet_present %}✓ Yes{% else %}✗ No{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer>
+                <p>Last updated: <span id="time"></span></p>
+                <p>Dashboard will refresh automatically</p>
+            </footer>
+
+        {% else %}
+            <div class="table-container">
+                <div class="no-data">
+                    <h2>📭 No Sensor Data Available</h2>
+                    <p style="color: black;">Make sure your sensor simulation is running</p>
+                    <code>python sensor_warehouse.py</code>
+                    <p style="margin-top: 20px;">This page will auto-refresh when data becomes available.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Display current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time').textContent = now.toLocaleTimeString();
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Auto-refresh page every 5 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 5000);
+    </script>
+</body>
+</html>
