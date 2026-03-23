@@ -29,5 +29,7 @@ Features:
  5-Auto-refreshing web dashboard showing latest 15 readings
  6-Data persistence with SQLite
 
+ You can find a concise step by step guide for this project in the file "smart warehouse monitoring system.pdf"
+
 
  
