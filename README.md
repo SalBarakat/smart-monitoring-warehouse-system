@@ -19,7 +19,7 @@ Start Mosquitto MQTT broker,
 Run the MQTT subscriber: python database.py,
 Run the sensor simulator: python sensor_warehouse.py,
 Run the Flask app: python app.py,
-Open http://127.0.0.1:5000 in your browser
+Open your local host in your browser
 
 Features:
 1-Real-time sensor data simulation (temperature, humidity, vibration)
